@@ -1,34 +1,39 @@
-RWMetro = function(target, trajLength, x, COV, burnin=0)
-{
-  require(MASS)
-  trajectory = rep(0,trajLength)
-  trajectory[1] = x
+require(mvtnorm)
+
+RWMetro = function(target, trajLength, x, COV, burnin=0)  {
   
-  nAccepted = 0
-  nRejected = 0
+  d = length(x) # dimension of the target distribution
+  trajectory = matrix(0,trajLength, d)
+  trajectory[1,] = x # initial point
   
-  for(t in 1:(trajLength-1)){
-    currentPosition = trajectory[t]
+  nAccepted = 0 #to count the number of accepted proposals
+  nRejected = 0 #to count the number of rejected proposals
+  
+  currentPosition = x
+  density = target(x)
+  
+  for(i in 1:(trajLength - 1)) {
     
-    proposedJump = mvrnorm(n=1, currentPosition, COV)
-    probAccept = min(1, target(proposedJump)/target(currentPosition))
+    proposedJump = rmvnorm(1, currentPosition, COV)
+    densityNew = target(proposedJump)
     
-    if(runif(1)<probAccept){
-      trajectory[t+1] = proposedJump
-      
-      if(t > burnin){
+    if(density <= densityNew || runif(1) * density < densityNew) {
+      trajectory[i + 1,] = proposedJump
+      currentPosition = proposedJump
+      density = densityNew
+      if(i >= burnin) {
         nAccepted = nAccepted + 1
       }
-    } else{
-      trajectory[t] = currentPosition
       
-      if(t > burnin){
+    } else {
+      trajectory[i + 1,] = currentPosition
+      if(i >= burnin) {
         nRejected = nRejected + 1
       }
     }
+    
   }
   
-  acceptedTraj = trajectory[(burnin+1):length(trajectory)]
-  AcceptanceRate = signif(nAccepted/length(acceptedTraj),3)
-  
+  AcceptanceRate = nAccepted / (trajLength - burnin)
+  trajectory[(burnin + 1):trajLength,]
 }
