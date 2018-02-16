@@ -7,14 +7,13 @@ AMetro = function(target, trajLength, x, beta, burnin = 0) {
   trajectory = matrix(0, trajLength, d)
   trajectory[1,] = x # initial point
   
-  nAccepted = 0 # to count the number of accepted proposals
-  nRejected = 0 # to count the number of rejected proposals
-  
+  nAccepted <<- 0 # to count the number of accepted proposals
+
   c1 <- (1 - beta)^2 * 2.38^2 / d
   C0 <- (0.1)^2 * diag(d) / d # covariance matrix for t <= 2d
   c2 <- beta^2 * C0
   d2 = d * 2
-  
+
   currentPosition <- x
   density <- target(x)
   sumx <- rep(0, d)
@@ -28,6 +27,8 @@ AMetro = function(target, trajLength, x, beta, burnin = 0) {
     } else {
       # the proposal distribution for i > 2d
       if (i == d2) {
+        nAccepted2d <<- nAccepted
+        AcceptanceRate2d <<- nAccepted / d2
         Ci_1 <- (i - 1) * cov(trajectory[1:i,])
       }
       else {
@@ -47,17 +48,14 @@ AMetro = function(target, trajLength, x, beta, burnin = 0) {
       currentPosition = proposedJump
       density <- densityNew
       if (i >= burnin) {
-        nAccepted = nAccepted + 1
+        nAccepted <<- nAccepted + 1
       }
     } else {
       trajectory[i + 1,] = currentPosition
-      if (i >= burnin) {
-        nRejected = nRejected + 1
-      }
     }
   }
   
-  AcceptanceRate = nAccepted / (trajLength - burnin)
+  AcceptanceRate <<- nAccepted / (trajLength - burnin)
   trajectory[(burnin + 1):trajLength,]
   
 }

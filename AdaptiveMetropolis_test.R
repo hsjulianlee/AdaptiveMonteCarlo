@@ -1,7 +1,7 @@
 source("AdaptiveMetropolis.R")
 
 d = 10
-N <- 1000
+N <- 10000
 b <- 0.05
 
 O = rep(0, d)
