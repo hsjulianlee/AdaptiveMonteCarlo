@@ -9,7 +9,7 @@ M = matrix(rnorm(d * d, 0, 1), ncol = d)
 MM = M %*% t(M)
 
 targetNMM = function(x, M = O, S = MM) {
-  return(dnorm(x, M, S))
+  return(dmvnorm(x, M, S))
 }
 
 trajectory = AMetro(target = targetNMM, trajLength = N, x = O, beta = b, burnin = 0)

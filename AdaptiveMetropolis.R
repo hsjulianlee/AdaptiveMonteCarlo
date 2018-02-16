@@ -1,5 +1,6 @@
+require(mvtnorm)
+
 AMetro = function(target, trajLength, x, beta, burnin = 0) {
-  require(MASS) 
   
   d = length(x) # the dimension of the target distribution
   
@@ -17,11 +18,11 @@ AMetro = function(target, trajLength, x, beta, burnin = 0) {
   for (i in 1:(trajLength - 1)) {
     if (i <= 2*d) {
       # the proposal distribution given at iteration i <= 2d
-      proposedJump = mvrnorm(1, currentPosition, C0)
+      proposedJump = rmvnorm(1, currentPosition, C0)
     } else {
       # the proposal distribution for i > 2d
       C = cov(trajectory[1:i,])
-      proposedJump = mvrnorm(1, currentPosition, (1 - beta)^2 * 2.38^2 * C / d + beta^2 * C0)
+      proposedJump = rmvnorm(1, currentPosition, (1 - beta)^2 * 2.38^2 * C / d + beta^2 * C0)
     }
     
     densityNew <- target(proposedJump)
