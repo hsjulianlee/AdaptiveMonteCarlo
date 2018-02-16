@@ -1,7 +1,7 @@
 source("AdaptiveMetropolis.R")
 
 d = 10
-N <- 10000
+N <- 1000
 b <- 0.05
 
 O = rep(0, d)
@@ -12,6 +12,8 @@ targetNMM = function(x, M = O, S = MM) {
   return(dmvnorm(x, M, S))
 }
 
+start_time <- Sys.time()
 trajectory = AMetro(target = targetNMM, trajLength = N, x = O, beta = b, burnin = 0)
+print(Sys.time() - start_time)
 
 plot(1:length(trajectory[,1]), trajectory[,1], "l")
