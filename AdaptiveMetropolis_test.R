@@ -1,6 +1,6 @@
 source("AdaptiveMetropolis.R")
 
-d = 10
+d = 100
 N <- 10000
 b <- 0.05
 
