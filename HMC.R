@@ -1,13 +1,15 @@
 library(MASS)
 
-# Single iteration of the HMC algorithm
-
-# U is a function which returns the potential energy given a value for q
-# grad_U is a function which returns the vector of partial derivatives of U given q
-# epsilon is the stepsize for leapfrog steps
-# L is the number of leapfrog steps in the trajectory
-# current_q is the current position that the trajectory starts from
-
+#' Single iteration of the HMC algorithm
+#'
+#' @param U a function which returns the potential energy given a value for q
+#' @param grad_U a function which returns the vector of partial derivatives of U given q
+#' @param epsilon the stepsize for leapfrog steps
+#' @param L the number of leapfrog steps in the trajectory
+#' @param current_q the current position that the trajectory starts from
+#'
+#' @return the position of the trajectory after L steps
+#'
 HMC = function (U, grad_U, epsilon, L, current_q)
 {
   q = current_q
@@ -40,12 +42,20 @@ HMC = function (U, grad_U, epsilon, L, current_q)
   }
 }
 
-# Sampling from a 100-dimensional multivariate Gaussian distribution in which
-# the variables are independent, with means of zero, and standard deviations
-# of 0.01, 0.02, ..., 0.99, 1.00.
+########################################################################################
+### 
+###       Sampling from a 100-dimensional multivariate Gaussian distribution in which
+###       the variables are independent, with means of zero, and standard deviations
+###       of 0.01, 0.02, ..., 0.99, 1.00.
+### 
+########################################################################################
 
-# A function to evaluate minus the log of the density of the distribution to be sampled
-# ie, the "potential energy".
+#' A function to evaluate minus the log of the density of the distribution to be sampled, i.e. the "potential energy".
+#'
+#' @param q the point at which to estimate the function 
+#'
+#' @return minus log of density at q 
+#'
 U = function (q)
 {
   k = 100
@@ -61,7 +71,12 @@ U = function (q)
   return(-log(f))
 }
 
-# A function which returns the vector of partial derivatives of U given q
+#' A function which returns the vector of partial derivatives of U given q
+#'
+#' @param q the point at which to estimate the function 
+#'
+#' @return the vector of partial derivatives of U at q 
+#'
 grad_U = function (q)
 {
   k = 100
