@@ -5,8 +5,8 @@ L = 150 # the number of steps in each proposal (T-segment)
 N = 1000 # the number of T-segments 
 k = 100 # the dimension of vectors (d in the paper) 
 
-Sigma = diag(seq(0.01, k * 0.01, by = 0.01)^2)
 mu = rep(0, k)
+vars = seq(0.01, k * 0.01, by = 0.01)^2 
 q = mvrnorm(n = 1, mu, Sigma)
 
 HMC_sample = matrix(nrow = N, ncol = k)

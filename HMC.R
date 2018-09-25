@@ -50,28 +50,20 @@ HMC = function (U, grad_U, epsilon, L, current_q)
 ### 
 ########################################################################################
 
-#' A function to evaluate minus the log of the density of the distribution to be sampled, i.e. the "potential energy".
+#' A function to evaluate minus the log of the normal density, i.e. the "potential energy". 
+#' The vector vars defining the standard deviations of coordinates should be defined outside the function. 
 #'
 #' @param q the point at which to estimate the function 
 #'
 #' @return minus log of density at q 
 #'
-U = function (q)
+U = function (q) 
 {
-  k = 100
-  # Covariance matrix
-  Sigma = diag(seq(0.01, 1, by = 0.01)^2)
-  # Determinant of covariance matrix
-  detSigma = prod(diag(Sigma))
-  # Diagonal of inverse of covariance matrix
-  invSigmad = diag(solve(Sigma))
-  # Density of the distribution
-  f = exp(-0.5 * sum(invSigmad * q^2)) / sqrt((2 * pi)^k * detSigma)
-  # Potential energy
-  return(-log(f))
+  return ( 0.5 * sum(q^2 / vars) + 2 * log( prod(vars) ) ) 
 }
 
-#' A function which returns the vector of partial derivatives of U given q
+#' A function which returns the vector of partial derivatives of U at q 
+#' The vector vars defining the standard deviations of coordinates should be defined outside the function. 
 #'
 #' @param q the point at which to estimate the function 
 #'
@@ -79,17 +71,5 @@ U = function (q)
 #'
 grad_U = function (q)
 {
-  k = 100
-  # Covariance matrix
-  Sigma = diag(seq(0.01, 1, by = 0.01)^2)
-  # Determinant of covariance matrix
-  detSigma = prod(diag(Sigma))
-  # Diagonal of inverse of covariance matrix
-  invSigmad = diag(solve(Sigma))
-  # Density of the distribution
-  f = exp(-0.5 * sum(invSigmad * q^2)) / sqrt((2 * pi)^k * detSigma)
-  # Partial derivatives of density of the distribution
-  df = -invSigmad * q * exp(-0.5 * sum(invSigmad * q^2)) / sqrt((2 * pi)^k * detSigma)
-  # Partial derivatives of U
-  return(-df/f)
+  return ( q / vars ) 
 }
