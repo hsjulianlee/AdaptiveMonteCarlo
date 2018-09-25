@@ -59,7 +59,7 @@ HMC = function (U, grad_U, epsilon, L, current_q)
 #'
 U = function (q) 
 {
-  return ( 0.5 * sum(q^2 / vars) + 2 * log( prod(vars) ) ) 
+  return ( 0.5 * sum(q^2 / vars) ) 
 }
 
 #' A function which returns the vector of partial derivatives of U at q 
