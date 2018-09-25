@@ -7,7 +7,7 @@ k = 100 # the dimension of vectors (d in the paper)
 
 mu = rep(0, k)
 vars = seq(0.01, k * 0.01, by = 0.01)^2 
-q = mvrnorm(n = 1, mu, Sigma)
+q = mvrnorm(n = 1, mu, diag(vars)) 
 
 HMC_sample = matrix(nrow = N, ncol = k)
 epsilon = runif(1, 0.0104, 0.0156)
