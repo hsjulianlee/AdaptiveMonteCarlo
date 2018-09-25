@@ -12,42 +12,41 @@ library(R.utils)
 runtsec = function(t, q, epsilon) {
   HMC_sample = matrix(q, nrow = 1) 
   withTimeout({ 
+    accepted <- 0 
     repeat {
-      q <- HMC(U, grad_U, epsilon, L, q) 
+      qnew <- HMC(U, grad_U, epsilon, L, q) 
+      if (any(qnew != q)) accepted <- accepted + 1 
+      q <- qnew 
       HMC_sample <- rbind(HMC_sample, q) 
     }
   }, substitute = FALSE, timeout = t, onTimeout = "silent") 
-  return ( HMC_sample )  
+  nT <- length(HMC_sample[,1]) - 1 
+  return ( list( nT = nT, sample = HMC_sample , ar = accepted / nT ) ) 
 }
 
 # HMC run
 L = 100 # the number of steps in each proposal (T-segment) 
 k = 100 # the dimension of vectors (d in the paper) 
+n = 10 # the number of simulated trajectories 
 
 t = 1 
 
 mu = rep(0, k) 
-vars = seq(0.01, k * 0.01, by = 0.01)^2 
-q = mvrnorm(n = 1, mu, diag(vars)) 
+vars = rep(1, k)^2 
 
-epsilon = 0.013 
+epsilon = 0.7 
 
-HMC_sample <- runtsec(t, q, epsilon) 
+nTs <- rep(0, n) 
+ses <- rep(0, n) 
+ars <- rep(0, n) 
+for (i in 1:n) {
+  q = mvrnorm(n = 1, mu, diag(vars)) 
+  results <- runtsec(t, q, epsilon) 
+  nTs[i] <- results$nT 
+  ses[i] <- mean(results$sample[,1])^2 
+  ars[i] <- results$ar 
+}
 
-# Figure 5.7 means
-means <- apply(HMC_sample, 2, mean)
-plot(sqrt(vars), means, pch = 16, ylim = c(-0.7, 0.7),
-     las = 1,
-     main = "Hamiltonian Monte Carlo",
-     xlab = "Standard deviation of coordinate",
-     ylab = "Sample mean of coordinate")
-abline(0, 0)
-
-# Figure 5.7 standard deviations
-sdevs <- apply(HMC_sample, 2, sd)
-plot(sqrt(vars), sdevs, pch = 16, ylim = c(0, 1.2), xlim = c(0, 1),
-     xaxs = "i", yaxs = "i", las = 1,
-     main = "Hamiltonian Monte Carlo",
-     xlab = "Standard deviation of coordinate",
-     ylab = "Sample standard deviation of coordinate")
-abline(0, 1)
+print(median(nTs)) 
+print(median(ars)) 
+boxplot(ses, xlab = as.character(median(ars))) 
