@@ -1,5 +1,6 @@
 source("HMC.R")
 
+library(dplyr)
 library(R.utils) 
 
 #' Run HMC for t seconds. 
@@ -27,26 +28,37 @@ runtsec = function(t, q, epsilon) {
 # HMC run
 L = 100 # the number of steps in each proposal (T-segment) 
 k = 100 # the dimension of vectors (d in the paper) 
-n = 10 # the number of simulated trajectories 
+n = 120 # the number of simulated trajectories 
 
-t = 1 
+t = 3 
 
 mu = rep(0, k) 
 vars = rep(1, k)^2 
 
-epsilon = 0.7 
+allses <- setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("mar", "se")) 
 
-nTs <- rep(0, n) 
-ses <- rep(0, n) 
-ars <- rep(0, n) 
-for (i in 1:n) {
-  q = mvrnorm(n = 1, mu, diag(vars)) 
-  results <- runtsec(t, q, epsilon) 
-  nTs[i] <- results$nT 
-  ses[i] <- mean(results$sample[,1])^2 
-  ars[i] <- results$ar 
-}
+for (epsilon in seq(0.85, 1.25, by = 0.1)) {
 
-print(median(nTs)) 
-print(median(ars)) 
-boxplot(ses, xlab = as.character(median(ars))) 
+  print(epsilon) 
+
+  nTs <- rep(0, n) 
+  ses <- rep(0, n) 
+  ars <- rep(0, n) 
+  for (i in 1:n) {
+    q = mvrnorm(n = 1, mu, diag(vars)) 
+    results <- runtsec(t, q, epsilon) 
+    nTs[i] <- results$nT 
+    ses[i] <- mean(results$sample[,1])^2 
+    ars[i] <- results$ar 
+  }
+  
+  print(median(nTs)) 
+  mar = median(ars) 
+
+  for (se in ses) {
+    allses <- add_row(allses, mar = round(mar, 3), se = se) 
+  }
+} 
+
+# plot but first remove what boxplot would think is an outlier! 
+boxplot(se~mar, allses, outline = FALSE) 
