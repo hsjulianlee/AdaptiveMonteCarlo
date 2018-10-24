@@ -44,7 +44,7 @@ plot(summary(q_fit_2), parm="Year", main="Slope coefficients for quantiles")
 
 MaxSpeed_3 <- MaxSpeed 
 for (i in 1:nrow(MaxSpeed_3)) {
-  MaxSpeed_3[i, 2] <- MaxSpeed_3[i, 1] * ls_fit$coefficients[[2]] + ls_fit$coefficients[[1]] + rnorm(1) 
+  MaxSpeed_3[i, 2] <- MaxSpeed_3[i, 1] * ls_fit$coefficients[[2]] + ls_fit$coefficients[[1]] + rnorm(1) * sd(MaxSpeed[,2]) 
 }
 ls_fit_3 <- lm(Wmax ~ Year, MaxSpeed_3) 
 title <- sprintf('LS: speed = %.3f%+.3f*year', ls_fit_3$coefficients[[1]], ls_fit_3$coefficients[[2]]) 
